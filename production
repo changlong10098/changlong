@@ -1,0 +1,67 @@
+public class Service(){
+
+//pro1为顾客准备购买的商品信息类
+	//warehouse为默认第一优先级的仓库，这个本应该根据顾客的地理位置去进行判断，这里姑且用题中给的条件w3=w2>w1,优先级为w1>w2>w3，所以第一优先级为w2
+	//orderNum为一个拆单计数器，根据这个计数器判断去哪个仓库下单
+	public void method(Production pro1,String warehouse,int orderNum){
+		
+		//先从第一优先级仓库 取得商品信息，与用户填写信息比较，判断数量是否满足需求，如果满足需求则不需要拆单，如果不满足需求，则获取下一优先级仓库，然后，进行递归操作
+		
+		Production pro2=this.search(pro1.getProductionName(), warehouse);
+		
+		if (pro2.getProductionNum()>=pro1.getProductionNum()) {
+			
+			//仓库商品存储量满足需求，只从这个仓库下单
+			this.getOrder(warehouse, pro1);
+		}else{
+			//仓库商品存储量不满足需求，先从这个仓库下单，再从下一优先级仓库下单
+			this.getOrder(warehouse, pro2);
+			
+			//得到下一优先级仓库
+			orderNum++;
+			warehouse=this.nextWarehouse(orderNum);
+			
+			//商品数量为总数减去上一单数量
+			pro1.setProductionNum(pro1.getProductionNum()-pro2.getProductionNum());
+			
+			this.method(pro1, warehouse,orderNum);
+		}
+		
+		
+	}
+	
+	public Production search(Production pro,String tableName){
+		//这是一个对数据库查询方法，根据顾客商品名称以及仓库所对应的表查询商品信息
+		//此处需要调用DAO层接口方法，得到一个名为Production的pojo类，
+		//Production pro2=接口.方法(pro.getProductionName(),tableName);
+		return pro2;
+	}
+	
+	public String nextWarehouse(int orderNum){
+		
+		String warehouse="w2";
+		
+		switch(orderNum){
+		case 1:
+			//第二优先级仓库
+			warehouse="w3";
+			break;
+		case 2:
+			//第三优先级仓库
+			warehouse="w1";
+			break;
+		}
+		
+		return warehouse;
+	}
+	
+	public void getOrder(String warehouse,Production pro){
+  
+    //这个方法是创建订单的
+		Order order=new Order();
+		order.setProductionName(pro.getProductionName());
+		order.setProductionNum(pro.getProductionNUm());
+		//此处需要调用一个DAO层接口方法，将订单保存到数据库中;
+	}
+
+}
